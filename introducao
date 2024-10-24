@@ -1,1 +1,82 @@
 
+CREATE TABLE ALUNOS (
+    NUSP NUMBER(10) PRIMARY KEY,
+    CPF NUMBER(11),
+    NOME VARCHAR2(50),
+    CIDADE VARCHAR2(50),
+    ANOING NUMBER(4)
+);
+
+INSERT INTO ALUNOS (NUSP, CPF, NOME, CIDADE, ANOING) VALUES (1, 1112233344, 'Ana', 'Araraquara', 2016);
+
+INSERT INTO ALUNOS (NUSP, CPF, NOME, CIDADE, ANOING) VALUES (2, 11122233355, 'Pedro', 'Sao Carlos', 2015);
+
+SELECT NOME, CIDADE FROM ALUNOS;
+
+SELECT *FROM ALUNOS;
+
+SELECT NOME FROM ALUNOS WHERE ANOING >= 2016;
+
+CREATE TABLE Time (
+    nome VARCHAR2(50) PRIMARY KEY,
+    estado VARCHAR2(2) NOT NULL,
+    tipo VARCHAR2(20) CHECK (tipo IN ('AMADOR', 'PROFISSIONAL')),
+    saldo_gols NUMBER
+);
+
+SELECT * FROM USER_TABLES WHERE TABLE_NAME = 'TIME';
+
+CREATE TABLE Joga (
+    time1 VARCHAR2(50),
+    time2 VARCHAR2(50),
+    classico VARCHAR2(3) CHECK (classico IN ('SIM', 'NAO')),
+    CONSTRAINT fk_time1_joga FOREIGN KEY (time1) REFERENCES Time (nome) ON DELETE CASCADE,
+    CONSTRAINT fk_time2_joga FOREIGN KEY (time2) REFERENCES Time (nome) ON DELETE CASCADE,
+    PRIMARY KEY (time1, time2)
+);
+
+
+SELECT * FROM USER_TABLES WHERE TABLE_NAME = 'JOGA';
+
+CREATE TABLE Partida (
+    time1 VARCHAR2(50),
+    time2 VARCHAR2(50),
+    data DATE NOT NULL,
+    placar VARCHAR2(5) DEFAULT '0X0' CHECK (REGEXP_LIKE(placar, '^[0-9]X[0-9]$')),
+    local VARCHAR2(50),
+    CONSTRAINT fk_time1 FOREIGN KEY (time1) REFERENCES Time (nome) ON DELETE CASCADE,
+    CONSTRAINT fk_time2 FOREIGN KEY (time2) REFERENCES Time (nome) ON DELETE CASCADE,
+    PRIMARY KEY (time1, time2, data)
+);
+
+CREATE TABLE Jogador (
+    cpf VARCHAR2(11) PRIMARY KEY,
+    rg VARCHAR2(10) NOT NULL,
+    nome VARCHAR2(50) NOT NULL,
+    data_nasc DATE NOT NULL,
+    naturalidade VARCHAR2(50),
+    time VARCHAR2(50),
+    CONSTRAINT fk_time_jogador FOREIGN KEY (time) REFERENCES Time (nome) ON DELETE SET NULL
+);
+
+CREATE TABLE Posicao_Jogador (
+    jogador VARCHAR2(11),
+    posicao VARCHAR2(20),
+    CONSTRAINT fk_jogador FOREIGN KEY (jogador) REFERENCES Jogador (cpf) ON DELETE CASCADE,
+    PRIMARY KEY (jogador, posicao)
+);
+
+CREATE TABLE Posicao_Jogador (
+    jogador VARCHAR2(11),
+    posicao VARCHAR2(20),
+    CONSTRAINT fk_jogador FOREIGN KEY (jogador) REFERENCES Jogador (cpf) ON DELETE CASCADE,
+    PRIMARY KEY (jogador, posicao)
+);
+
+CREATE TABLE Uniforme (
+    time VARCHAR2(50),
+    tipo VARCHAR2(20) CHECK (tipo IN ('TITULAR', 'RESERVA')),
+    cor_principal VARCHAR2(20),
+    CONSTRAINT fk_time_uniforme FOREIGN KEY (time) REFERENCES Time (nome) ON DELETE CASCADE,
+    PRIMARY KEY (time, tipo)
+);
